@@ -1,0 +1,29 @@
+name: CI
+on:
+  - push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - uses: actions/setup-java@387ac29b308b003ca37ba93a6cab5eb57c8f5f93 # v4.0.0
+        with:
+          distribution: 'zulu'
+          java-version: |
+            17
+      - run: ./mvnw compile
+      - uses: Godin/github-action-setup-java/setup-java@main
+        with:
+          version: 5
+      - run: |
+          ${JAVA_HOME_5_X64}/bin/javac \
+              -cp ~/.m2/repository/org/ow2/asm/asm/9.9.1/asm-9.9.1.jar \
+              -Xbootclasspath/p:${PWD}/jdk5 \
+              src/main/java/Example.java
+          javap -v -p src/main/java/Example.class
+      - run: |
+          javac -version
+          ${JAVA_HOME_5_X64}/bin/javac \
+              -cp ~/.m2/repository/org/ow2/asm/asm/9.9.1/asm-9.9.1.jar \
+              src/main/java/Example.java
